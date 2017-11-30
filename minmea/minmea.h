@@ -37,6 +37,7 @@ enum minmea_sentence_id {
     MINMEA_SENTENCE_GSV,
     MINMEA_SENTENCE_VTG,
     MINMEA_SENTENCE_ZDA,
+    MINMEA_SENTENCE_GNS,
 };
 
 struct minmea_float {
@@ -164,6 +165,36 @@ struct minmea_sentence_zda {
     int minute_offset;
 };
 
+enum minmea_gns_mode {
+    MINMEA_GNS_MODE_DATA_INVALID = 'N',
+    MINMEA_GNS_MODE_AUTONOMOUS = 'A',
+    MINMEA_GNS_MODE_DIFFERENTIAL = 'D',
+    MINMEA_GNS_MODE_PRECISE = 'P',
+    MINMEA_GNS_MODE_REAL_TIME_KINEMATIC = 'R',
+    MINMEA_GNS_MODE_FLOAT_RTK = 'F',
+    MINMEA_GNS_MODE_ESTIMATED_DEAD_RECKONING = 'E',
+    MINMEA_GNS_MODE_MANUAL = 'M',
+    MINMEA_GNS_MODE_SIMULATOR = 'S',
+};
+
+enum minmea_nav_status_indicator {
+    MINMEA_NAV_STATUS_INVALID = 'V',
+};
+
+struct minmea_sentence_gns {
+    struct minmea_time time;
+    struct minmea_float latitude;
+    struct minmea_float longitude;
+    char gns_mode[8];
+    int sats_in_use;
+    struct minmea_float hdrop;
+    struct minmea_float antenna_alititude;
+    struct minmea_float geoidal_separation;
+    struct minmea_float age;
+    struct minmea_float station_id;
+    enum minmea_nav_status_indicator nav_status;
+};
+
 /**
  * Calculate raw sentence checksum. Does not check sentence integrity.
  */
@@ -208,6 +239,7 @@ bool minmea_parse_gst(struct minmea_sentence_gst *frame, const char *sentence);
 bool minmea_parse_gsv(struct minmea_sentence_gsv *frame, const char *sentence);
 bool minmea_parse_vtg(struct minmea_sentence_vtg *frame, const char *sentence);
 bool minmea_parse_zda(struct minmea_sentence_zda *frame, const char *sentence);
+bool minmea_parse_gns(struct minmea_sentence_gns *frame, const char *sentence);
 
 /**
  * Convert GPS UTC date/time representation to a UNIX timestamp.

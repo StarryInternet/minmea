@@ -886,6 +886,27 @@ START_TEST(test_minmea_parse_zda1)
 }
 END_TEST
 
+// // FIXME
+// START_TEST(test_minmea_parse_gns1)
+// {
+//     const char *sentence = "$GNGNS,092356.800,3442.8211,N,13520.1147,E,DDN,20,0.5,36.8,36.7,,,V*6A";
+//     struct minmea_sentence_gns frame = {};
+//     struct minmea_sentence_gns expected = {};
+
+//     expected = (struct minmea_sentence_zda) {
+//         .time = { 16, 0, 12, 710000 },
+//         .date = { 11, 3, 2004 },
+//         .hour_offset = -1,
+//         .minute_offset = 0,
+//     };
+
+//     ck_assert(minmea_check(sentence, false) == true);
+//     ck_assert(minmea_check(sentence, true) == true);
+//     ck_assert(minmea_parse_gns(&frame, sentence) == true);
+//     ck_assert(!memcmp(&frame, &expected, sizeof(frame)));
+// }
+// END_TEST
+
 START_TEST(test_minmea_usage1)
 {
     const char *sentences[] = {
@@ -1078,6 +1099,7 @@ static Suite *minmea_suite(void)
     tcase_add_test(tc_parse, test_minmea_parse_vtg1);
     tcase_add_test(tc_parse, test_minmea_parse_vtg2);
     tcase_add_test(tc_parse, test_minmea_parse_zda1);
+    // tcase_add_test(tc_parse, test_minmea_parse_gns1);
     suite_add_tcase(s, tc_parse);
 
     TCase *tc_usage = tcase_create("minmea_usage");

@@ -637,4 +637,58 @@ int minmea_gettime(struct timespec *ts, const struct minmea_date *date, const st
     }
 }
 
+bool minmea_parse_gns(struct minmea_sentence_gns *frame, const char *sentence) {
+    // $GNGNS,092356.800,3442.8211,N,13520.1147,E,DDN,20,0.5,36.8,36.7,,,V*6A
+    char type[6];
+    int latitude_direction;
+    int longitude_direction;
+
+    memset(frame->gns_mode,
+           (char)MINMEA_GNS_MODE_DATA_INVALID,
+           sizeof(frame->gns_mode));
+
+    if (!minmea_scan(sentence, "tTfdfdsifffffc",
+            type,
+            &frame->time,
+            &frame->latitude,
+            &latitude_direction,
+            &frame->longitude,
+            &longitude_direction,
+            &frame->gns_mode[0],
+            &frame->sats_in_use,
+            &frame->hdrop,
+            &frame->antenna_alititude,
+            &frame->geoidal_separation,
+            &frame->age,
+            &frame->station_id,
+            &frame->nav_status))
+        return false;
+
+    if (strcmp(type+2, "GNS")) {
+        return false;
+    }
+
+    for (size_t i = 0; i < sizeof(frame->gns_mode); ++i) {
+        switch (frame->gns_mode[i]) {
+            case MINMEA_GNS_MODE_DATA_INVALID:
+            case MINMEA_GNS_MODE_AUTONOMOUS:
+            case MINMEA_GNS_MODE_DIFFERENTIAL:
+            case MINMEA_GNS_MODE_PRECISE:
+            case MINMEA_GNS_MODE_REAL_TIME_KINEMATIC:
+            case MINMEA_GNS_MODE_FLOAT_RTK:
+            case MINMEA_GNS_MODE_ESTIMATED_DEAD_RECKONING:
+            case MINMEA_GNS_MODE_MANUAL:
+            case MINMEA_GNS_MODE_SIMULATOR:
+                break;
+            default:
+                return false;
+        }
+    }
+
+    frame->latitude.value *= latitude_direction;
+    frame->longitude.value *= longitude_direction;
+
+    return true;
+}
+
 /* vim: set ts=4 sw=4 et: */
