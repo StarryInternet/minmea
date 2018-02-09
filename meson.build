@@ -25,6 +25,8 @@ minmea_includes = include_directories('.')
 
 minmea_sources = ['minmea/minmea.c']
 
+minmea_headers = ['minmea/minmea.h']
+
 minmea_dependencies = []
 
 minmea_lib = library(
@@ -33,6 +35,9 @@ minmea_lib = library(
     include_directories: minmea_includes,
     dependencies: minmea_dependencies,
     c_args: c_args,
+    install: true,
+    # https://github.com/mesonbuild/meson/issues/2038
+    install_dir: 'lib',
 )
 
 minmea_dep = declare_dependency(
@@ -77,3 +82,17 @@ if get_option('tests')
 
     test('tests', minmea_test)
 endif
+
+if get_option('install_headers')
+    install_headers(minmea_headers, subdir: 'minmea')
+endif
+
+pkg = import('pkgconfig')
+pkg.generate(
+    name: 'minmea',
+    description: 'who cares',
+    version: '0.0.0',
+    libraries: [minmea_lib],
+    # https://github.com/mesonbuild/meson/issues/2038
+    install_dir: 'lib/pkgconfig',
+)
