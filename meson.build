@@ -1,6 +1,7 @@
 project(
     'minmea',
     'c',
+    version: run_command(['cat', files('VERSION')]).stdout().strip(),
     default_options: ['c_std=c99', 'buildtype=debug'],
 )
 
@@ -38,6 +39,7 @@ minmea_lib = library(
     install: true,
     # https://github.com/mesonbuild/meson/issues/2038
     install_dir: 'lib',
+    version: meson.project_version(),
 )
 
 minmea_dep = declare_dependency(
@@ -91,7 +93,7 @@ pkg = import('pkgconfig')
 pkg.generate(
     name: 'minmea',
     description: 'who cares',
-    version: '0.0.0',
+    version: meson.project_version(),
     libraries: [minmea_lib],
     # https://github.com/mesonbuild/meson/issues/2038
     install_dir: 'lib/pkgconfig',
